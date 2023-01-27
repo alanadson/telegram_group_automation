@@ -1,0 +1,6 @@
+pyrogram
+TgCrypto
+Pillow
+configparser
+openpyxl
+requests
