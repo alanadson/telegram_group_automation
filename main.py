@@ -116,13 +116,13 @@ class Menu:
         workbook = openpyxl.load_workbook(f"{filename}.xlsx")
         sheet = workbook.active
 
-        usernames = []
-
         column = int(input("Enter the column: "))
         min_row = int(input("Enter the starting row: "))
 
-        for row in sheet.iter_rows(min_row=min_row, values_only=True):
-            usernames.append(row[column - 1])
+        usernames = [
+            row[column - 1]
+            for row in sheet.iter_rows(min_row=min_row, values_only=True)
+        ]
         random.shuffle(usernames)
 
         num_users = int(input("Enter the number of users you want to add: "))
@@ -166,12 +166,9 @@ class Menu:
 
         chats = client.get_dialogs()
 
-        row_num = 2
-        for chat in chats:
+        for row_num, chat in enumerate(chats, start=2):
             sheet.cell(row=row_num, column=1).value = chat.chat.title
             sheet.cell(row=row_num, column=2).value = chat.chat.id
-            row_num += 1
-
         workbook.save("Grupos.xlsx")
 
     def export_users_from_group(self):
@@ -225,7 +222,7 @@ class Menu:
         except FileNotFoundError:
             sent_messages = []
 
-        for i, member in enumerate(members):
+        for member in members:
             user_id = member.user.id
             if user_id not in sent_messages:
                 sent_messages.append(user_id)
@@ -258,7 +255,7 @@ class Menu:
             data = response.json()
             first_name = data['results'][0]['name']['first']
             last_name = data['results'][0]['name']['last']
-            name = first_name + " " + last_name
+            name = f"{first_name} {last_name}"
             photo = data['results'][0]['picture']['large']
             bio = "Hi, How are You?"
 
@@ -266,14 +263,14 @@ class Menu:
             path = "path/to/save"
             if not os.path.exists(path):
                 os.makedirs(path)
-            open(path + "/photo.jpg", "wb").write(response.content)
-            with Image.open(path + "/photo.jpg") as im:
+            open(f"{path}/photo.jpg", "wb").write(response.content)
+            with Image.open(f"{path}/photo.jpg") as im:
                 width, height = im.size
                 if width < 200 or height < 200:
                     size = (200, 200)
                     im = im.resize(size)
-                    im.save(path + "/photo.jpg")
-            client.set_profile_photo(photo=path + "/photo.jpg")
+                    im.save(f"{path}/photo.jpg")
+            client.set_profile_photo(photo=f"{path}/photo.jpg")
             time.sleep(45)
             client.update_profile(first_name=name)
             time.sleep(52)
